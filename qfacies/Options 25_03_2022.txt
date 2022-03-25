@@ -1,0 +1,202 @@
+; ===============================================================================
+; ===================== OPTIONS FILE for Q-Facies software ======================
+; ===============================================================================
+; TThis file shows the options for analyzing a set of chemical analysis using 
+; Q-Facies sofware
+; It is essential to respect the format of this file to avoid errors
+; All lines preceded by ";" are comments.
+; The symbol "==>" indicates options that a variable can take.
+
+; In the file "How to Q_Facies.pdf" you can find a more detailed description of 
+; these variables and graphical examples.  
+
+; ===============================================================================
+; ============================ GENERAL OPTIONS ==================================
+; ===============================================================================
+
+; Name of the input data file (with extension), must be located at 'Data' folder
+fname='Alfamen.txt'
+
+; How to analyze the dataset
+; ===> 'by_groups','by_time'
+way='by_time'
+
+; Wether to consider outlier points or not
+; ===>  True or False
+lof=False
+
+; Number of surroundings points taking into account while computing LOF algorithm.
+lof_neighbours=20
+
+; Create an Excel with the output information (saved in 'Data' folder)
+; ===> True or False
+excel=False
+
+; Concentrations in percentage of meq/L
+; If True then concentration in mg/L or ppm, if false then concentration in % meq/L
+; ===> True or False
+transform=True
+
+; ===============================================================================
+; ========================== TIME ANALYSIS OPTIONS ==============================
+; ===============================================================================
+; These options are only considered when the variable way is set to 'by_time'
+
+; Dates format 
+; More information at: https://www.dataindependent.com/pandas/pandas-to-datetime/
+time_format= '%d/%m/%Y'
+
+; Width of the window (time steps) at which the program will be creating groups 
+; ===> Integer > 3 time steps
+window_size=8
+
+; Magnitud (time steps) of the step when rolling the window
+; ===> Integer
+freq=4
+
+; Space the time-series in regular intervals? 
+; ===> True or False
+space=False
+
+; Time interval of time-series spacing. Only considered when space=True.
+; A custom frequency can be made by preceding the date acronym by an integer. 
+; e.g.: every-17-days freq would be input as '17D'
+; ===>  'yearly', 'monthly', 'weekly', 'daily'
+space_interval='yearly' 
+
+; Agregation method for the resample function
+; ===> 'mean','last','first'
+agregation='mean' 
+
+; ===============================================================================
+; ============================== GRAPHICS OPTIONS ===============================
+; ===============================================================================
+;
+; All the output graphics will be stored at 'Graphics' folder.
+;
+; The color to use in the different elements can be specifed by two ways: 
+; a) Following Matplotlib nomenclature (see https://matplotlib.org/stable/gallery/
+; color/named_colors.html) Eg: 'blue'
+; b) Following HEX nomenclature.Eg '#BB2EB3'
+;
+
+; =================== Drawing options for LINES AND POINTS  ======================
+
+; Plot the outliers points? (note that they hasn't been considered during indexes
+; calculations) 
+; ===> True or False
+plot_outliers=True
+
+; Color of the outliers points
+; ===> Colour name or code
+color_outliers='Red'
+
+; Size of all plotted points. 
+; ===> Integer
+point_size=8
+
+; Points transparency 
+; ===> Float between 0 (transparent) and 1 (opaque)
+point_transparency=0.8
+
+; Color of the points that conform the convex hull
+; ===> Colour name or code
+color_outter_points='black'
+
+; Color of the points that lies within the convex hull
+; ===> Colour name or code
+color_inner_points='grey'
+
+; Regression line width
+line_lw=0.5
+
+; Regression line color
+; ===> Colour name or code
+line_color='#2774CC'
+
+; ================== Graphical options for POLYGONS AND HULLS ===================
+
+; Convex hull color 
+; ===> Colour name or code
+pol_color='green'
+
+; Convex hull Transparency
+; ===> Float between 0 (transparent) and 1 (opaque)
+pol_transparency=1
+
+; Perimeter line width of the convex hull polygon
+pol_lw=0.5
+
+; Perimeter line color of the convex hull polygon
+; ===> Colour name or code
+pol_ec='red'
+
+; Color palette to be used in color scaled figures
+; Examples: 'Greens', 'Greys', 'Blues', 'Reds', 'YlOrBr', 'Spectral', etc.
+; Many more options are available at:
+; https://matplotlib.org/3.1.1/tutorials/colors/colormaps.html
+; ===> Pallete name
+cmap_name='Greens'
+
+; Color to plot the polygons
+; This could be done attending to a specific color or a color pallete
+folder_color='Spectral'
+
+; ============= Graphical options for COLOR PALETTE AND CLIPPING ================
+
+; Wether to reverse the color pallete or not 
+; ===> True or False
+cmap_reversed=False
+
+; Clip the regression lines attending to the panels' extensions
+; ===> True or False
+clip_lines=False
+
+; ================= Outoput Graphics format and Resolution ======================
+
+; Figure's resolution (in dots per inch)
+; ===> Integer
+dpi=400
+
+; Output graphic format
+; ===> 'jpg', 'png', 'svg', 'pdf', 'ps' 
+extension_graph='png'
+
+; ===============================================================================
+; ================== WHAT GRAPHICS TO DRAW AND HOW TO DO IT =====================
+; ===============================================================================
+
+; Create a Piper-diagram per group with all the index information?. 
+; ===> True or False
+figs=True
+
+; Draw a Piper-diagram including all the convex hulls 
+; ===> True or False
+overlap_fig=True
+
+; Color grading can be done based on any of the indexes:
+; ===> 'Area', 'Shape', 'Blau','Angle', 'Time', 'Dispersion'.
+overlap_var='Blau'
+
+; You can draw both the polygon and the centroid.
+; ===> 'centroids', 'polygons'
+overlap_way='polygons'
+
+; Plot a time evolution figure or histogram
+; When way='by_time', each plot shows the indexes' temporal evolution
+; When way='by_groups', each plot shows a stacked bars histogram
+; ===> True or False
+evolution_fig=True
+
+; Plot a figure with all the points graduated by date.
+; This option is only available when way='by_time' 
+; Color palette for the figure is defined by cmap_name 
+; ===> True or False
+plot_all=True
+
+; ===============================================================================
+; ============================== OTHER OPTIONS ==================================
+; ===============================================================================
+
+; Ignore all execution warnings. True or False
+ignore_warnings=True
