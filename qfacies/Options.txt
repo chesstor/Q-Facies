@@ -1,139 +1,140 @@
-; ===================== OPTIONS FILE for qfacies package ========================
 ; ===============================================================================
-; This file define the options for applying qfacies to a specifed dataset.
-; It is essential to respect the format to avoid errors in the program execution.
+; ===================== OPTIONS FILE for Q-Facies package ========================
+; ===============================================================================
+; This file defines the options for running Q-Facies on a specifed dataset.
+; It is essential to comply with format options to avoid errors in program execution.
 
 ; ===============================================================================
 ; ============================ GENERAL OPTIONS ==================================
 ; ===============================================================================
 
-; Name of the input file (including extension). It shoud be localized in 'Data' folder.
-fname='grupos.txt'
+; Name of the input file (including extension). It must be stored in the 'Data' folder.
+fname="Datos Almeria 2.txt"
 
-; Way of analyze the dataset:'by_groups','by_time'
+; Way of analyzing the dataset:'by_groups','by_time'
 way='by_groups'
 
-; Wether to consider outlier points or not. True or False
-; Outliers detection is computed in two steps:
-; _._In the first step, a preliminary ; detection of outliers is done throughout
-;    an unsupervised outlier detection method using Local Outlier Factor (LOF,
-;    from sklearn library). For more info, visit:
-;    https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.LocalOutlierFactor.html
-; _._In the second step, this outliers are checked and only those within the convex
-;    hull polygon will be consider.
-lof=False
-
-; Number of surroundings points taking into account while computing LOF algorithm.
-; Note that, the lower this value is, the more points will be consider as outliers.
-; If n_neighbors is larger than the number of samples provided, all samples will be used.
-lof_neighbours=20
-
-;Create an Excel with the output information (saved in 'Data' folder). True or False
-excel=False
-
-;Transform ions concentrations from mg/L or ppm to percentage of meq/L. 
-;True or False
+; Transform concentrations to percentage of meq/l
+; True if the input data is in mg/l or ppm, and False if it is already in % meq/l
+; ===> True or False
 transform=True
 
-; ===============================================================================
-; ========================== Time series options=================================
-; ===============================================================================
-;Only considered when way='by_time'
+; Whether to consider outlier points or not. True or False
+; Outliers detection is computed in two steps:
+; _._In the first step, a preliminary detection of outliers is done with
+;    an unsupervised outlier detection method: Local Outlier Factor (LOF,
+;    from sklearn library). For more info, visit:
+;    https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.LocalOutlierFactor.html
+; _._In the second step, these outliers are checked and only those outside the convex
+;    hull polygon will be discarded.
+lof=True
 
-; Format of dates. For more info, visit:
+; Number of surrounding points to compute the LOF algorithm. Positive integer.
+; Note that the lower this value is, the more points will be considered as outliers.
+; If lof_neighbors is larger than the number of samples provided, all samples will be used.
+lof_neighbours=15
+
+; Whether to create an Excel file with the output information (saved to the 'Data' folder). True or False
+excel=True
+
+; ===============================================================================
+; ========================== Time series options ================================
+; ===============================================================================
+; Time series options are only considered when way='by_time'
+; The file "How_to_QFacies.pdf" shows graphically the meaning of each variable
+; considered in this section.
+
+; Specify the date format. For more info, visit:
 ; https://www.dataindependent.com/pandas/pandas-to-datetime/
-time_format= '%d/%m/%Y'
+datetime_format = '%d/%m/%Y'
 
-; Width of the window at which the program will be creating groups. Integer.
-; It has always to be greater than three, which is the minimum number required
-; to create groups
-window_size=4
+; Width of the rolling window to create temporal groups. Positive integer.
+; It has to be greater than three, minimum group size.
+window_size=96
 
-; Magnitud of the step when rolling the window.Integer.
-freq=1
+; Size of the step for the rolling window. Positive integer.
+step_length=12
 
-; Space the time-series in regular intervals? True or False
-space=False
 
-; Time interval of time-series spacing. Only considered when space=True.
-; Options: 'yearly', 'monthly', 'weekly', 'daily'
-; Other options can be found at:
-; https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases
-; A personal frequency can be made just preceeding the acronym options of the last 
-; website by an integer number. Eg: An every-17-days freq would be input as '17D'
-space_interval='yearly' 
+; =============================================================================
+; ======= Fill out this section only if you want to resample the series =======
+; Resample the time series to regular intervals? True or False
+resample=True
 
-; Agregation method for the resample function: 'mean','last','first'
-agregation='first' 
+; Frequency of time series intervals. Only considered when resample=True.
+; Supported string aliases can be found at: 
+; https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases  
+; A custom frequency can be defined by preceding the acronym by a positive integer (e.g., every-17-days = '17D')
+; A more detailed explanation can be found in the "How_to_QFacies.pdf" file
+; Standard options ===>  'yearly' or 'Y', 'monthly' or 'M', 'weekly' or 'W', 'daily' or 'D'
+resample_interval='M'
+
+; Resampling aggregation method: 'mean','last','first'
+aggregation='first' 
 
 ; ===============================================================================
 ; ==================== Visual Representation Options ============================
 ; ===============================================================================
 ;
-; All the output graphics will be stored at 'Graphics' folder.
+; All the output plots will be stored in the 'Graphics' folder.
 ;
-; The color to use in the different elements can be specifed by two ways: 
-; a) Following Matplotlib nomenclature (see https://matplotlib.org/stable/gallery/
-; color/named_colors.html) Eg: 'blue'
-; b) Following HEX nomenclature.Eg '#BB2EB3'
+; The color scheme to be used in the different elements can be specified in two ways: 
+; a) Following Matplotlib nomenclature (https://matplotlib.org/stable/gallery/color/named_colors.html) E.g. 'blue'
+; b) Following HEX nomenclature. E.g. '#BB2EB3'
 ;
 
 ; ========================= Graphical specificacions ============================
 
-; Plot outliers points (note that they hasn't been considered during indexes
-; calculations)
+; Plot outliers points (note that they are not considered for indices calculations)
 plot_outliers=True
 
 ; Color of outliers points.
-color_outliers='Red'
+color_outliers='red'
 
-; Point size. This size will be apply to all plotted points. Integer.
+; Point size. This size will be apply to all plotted points. Positive integer.
 point_size=8
 
-; Points transparency. Float between 0 (transparent) and 1 (opaque)
+; Points transparency. Real number between 0 (transparent) and 1 (opaque)
 point_transparency=0.8
 
-; Points color of the points that conform the convex hull.
+; Color of the points that conform the convex hull.
 color_outter_points='black'
 
-; Points color of the points that lies within the convex hull.
+; Color of the points that lay within the convex hull.
 color_inner_points='grey'
 
-; Regression line width.
+; Regression line width. Real number.
 line_lw=0.5
 
 ; Regression line color.
-line_color='#2774CC'
+line_color='#47a0b3'
 
-; Convex hull color. 
-pol_color='#F395A6'
-
-; Convex hull transparency. Float between 0 (transparent) and 1 (opaque).
+; Convex hull transparency. Real number between 0 (transparent) and 1 (opaque).
 pol_transparency=1
 
-; Perimeter line width of the convex hull polygon.
+; Line width of the convex hull polygon.
 pol_lw=0.5
 
-; Perimeter line color of the convex hull polygon.
-pol_ec='black'
+; Line color of the convex hull polygon.
+pol_ec='yellow'
 
-; Color palette that will be used in the figures.
+; Color palette to be used in the figures.
 ; Examples: 'Greens', 'Greys', 'Blues', 'Reds', 'YlOrBr', 'Spectral', etc.
 ; Many more options are available at:
-; https://matplotlib.org/3.1.1/tutorials/colors/colormaps.html
-cmap_name='Reds'
+; https://matplotlib.org/stable/tutorials/colors/colormaps.html
+cmap_name='YlOrBr'
 
-; Optional color to plot the figures inside Graphics' folder.
-; This could be done attending to a specific color or a color pallete.
-folder_color='Spectral'
+; Optional color to plot the figures in the 'Graphics' folder.
+; Either a specific color or a color palette can be used.
+folder_color='green'
 
-; Wether to reverse the color pallete or not. True or False.
+; Whether to reverse the color palette or not. True or False.
 cmap_reversed=False
 
-; Clip the regression lines attending to the panels' extensions. True or False.
+; Clip regression lines at panels' edges. True or False.
 clip_lines=False
 
-; Figure's resolution (in dots per inch). Integer.
+; Figure resolution (in dots per inch). Positive integer.
 dpi=400
 
 ; Output graphic format: 'jpg', 'png', 'svg', 'pdf', 'ps' 
@@ -141,27 +142,26 @@ extension_graph='png'
 
 ; =========================== Visual Methods ====================================
 
-; Create a Piper-diagram per group with all the index information. True or False.
-figs=False 
+; Whether to create a Piper diagram per group with all the indices information. True or False.
+figs=True 
 
-; Create a Piper-diagram including all the convex hulls of the dataset. True or False.
-overlap_fig=False
+; Whether to create a Piper diagram including all the convex hulls of the dataset for a given index. True or False.
+overlap_fig=True
 
-; Choose the variable in which to graduate de 'overlap_fig' figure.
+; Index represented by graduated colors of the convex hulls in the 'overlap_fig'.
 ; Options: 'Area', 'Shape', 'Blau','Angle', 'Time', 'Dispersion'.
-overlap_var='Angle'
+overlap_var='Time'
 
-; Choose wether to represent the polygon of the convex hull or its centroid at 
-; overlap_fig. Options:'centroids', 'polygons'.
-overlap_way='centroids'
+; Whether to represent the polygon of the convex hull or its centroid in the 'overlap_fig'. 
+; Options:'centroids', 'polygons'.
+overlap_way='polygons'
 
-; Create a figure composed by three plots (one per panel) with the information
-; of the whole indixes.
-; When way='by_time', each plot shows the indixes' temporal evolution.
+; Create a summary figure composed by three plots (one per panel) with the information of all the indices.
+; When way='by_time', each plot shows the indices' temporal evolution.
 ; When way='by_groups', each plot shows a stacked bars histogram.
-evolution_fig=False
+evolution_fig=True
 
-; Create a figure with all the points graduated by its date. True or False.
+; Create a figure with all the points graduated by date. True or False.
 ; Only available when way='by_time'. cmap_name will be used as color palette.
 plot_all=True
 

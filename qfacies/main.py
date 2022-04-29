@@ -4,46 +4,45 @@
                      Geological Survey of Spain
 
                              Q-Facies
-                            Version 1.0
-                            01-10-2021
+                            Version 1.1
+                            26-04-2022
   Authors:
-	M. González Jiménez   miguel.gonzalez@igme.es
+	M. González-Jiménez   miguel.gonzalez@igme.es
 	L. Moreno             l.moreno@igme.es	
 	H. Aguilera           h.aguilera@igme.es
 	A. De la Losa         a.delalosa@igme.es
 	A. Romero             a.romero@igme.es
 
-If you have some problem with the code or want to propose some modification,
-please contact with M. González Jiménez.
+If you have any problem with the code or want to suggest possible modifications,
+please contact H. Aguilera
 
 ===============================================================================
 ===============================================================================
-
-
  ------------------------------------------------------------------------------
  --------------------- DATA ENTRY FILE FORMAT ---------------------------------
  ------------------------------------------------------------------------------
 Position:           1         2  3   4   5    6     7    8   9
 Variable:  ID_group or Date  Ca  Mg  Na  K   HCO3  CO3  SO4  Cl
 
-ASCII file separated by tabs   (\t)
-The decimal separator is point (.)
+ASCII file separated by tabs (\t)
+The decimal separator is the decimal point (.)
 ===============================================================================
 ===============================================================================
 '''
 
-__version__ = "1.0"
+__version__ = "1.1"
 
 import numpy as np
 import pandas as pd
 from matplotlib import cm
+import math
 
 import time, warnings
 
-from plot import Overlap, Plot_all, Evolution_time, Evolution_groups, Skeleton
+from plot import Overlap, Plot_all, Evolution_time, Evolution_groups
 import plot as qplot
 from diagram import Diagram
-import calculous as cal
+import calculation as cal
 
 ###############################################################################
 ###################---------- Variables defining ---------#####################
@@ -60,11 +59,11 @@ with open('Options.txt', 'r') as file:
         exec(f'kw = dict({plain_text})')
         
     except SyntaxError:
-        print("Something is wrong in the Options.txt file \n \
-               Check out that non-variables lines  start by ';' \n \
-               and the following on the variable lines: \n \
-                _Variables should be define by '=' \n \
-                _The name of the variable cannot contain spaces. \n \
+        print("Something is wrong with the Options.txt file \n \
+               Please check that commented lines start with ';' \n \
+               and check the following on variable assignment lines: \n \
+                _Variables should be defined using the '=' symbol \n \
+                _The name of the variable cannot contain whitespaces. \n \
                 _When assigning a string to a variable, this must be \n \
                     enclosed in quotation marks")
         raise
@@ -84,12 +83,12 @@ class Dataset:
     ''' Main class of the program'''
     
     def __init__(self, fname, way='by_groups', **kw):
-        '''Read the dataset from 'Data' folder
-        way:str {'by_groups', 'by_time'} default 'by_groups
-            Way of analyze hydrochemical facies evolution.
+        '''Read the dataset from the 'Data' folder
+            way:str {'by_groups', 'by_time'} default 'by_groups'
+            Way of analyzing hydrochemical facies evolution.
             'by_groups' -> study the facies of defined groups
             'by_time'   -> study the facies of the temporal series throughout
-                           a rolling window. In this case, window params need
+                           a rolling window. In this case, window parameters need
                            to be set.'''
         file = ReadDataFile(fname, way, **kw)
         self.fname = fname.split('.')[0]
@@ -100,12 +99,12 @@ class Dataset:
     def main(self, way, **kw):
         '''Program execution'''
         _g = self.by_groups() if way == 'by_groups' else self.by_time(
-                       window_size=kw['window_size'], freq=kw['freq'])
+                       window_size=kw['window_size'], freq=kw['step_length'])
         # Clean the groups of NaN rows.
         self.groups = self._group_filter(_g)
         
         polygon_colors = self._color_diagram(folder_color=kw['folder_color'])
-        kw.pop('pol_color') # Delete so as not to overwrite kwargs.
+        #kw.pop('pol_color') # Delete so as not to overwrite kwargs.
         self.diagrams = [Diagram(i, self.way, self.fname, pol_color=j, **kw)
                          for i,j in zip(self.groups, polygon_colors)]
         
@@ -114,7 +113,7 @@ class Dataset:
     
     def _color_diagram(self, folder_color='Spectral', reverse=False):
         ''' Return a discretized list of a determined colormap with as many 
-        elements as groups has to analyze'''
+        elements as groups to be analyzed'''
         try:
             folder_color = cm.get_cmap(folder_color)
             folder_color = folder_color.reversed() if not reversed else folder_color
@@ -125,7 +124,7 @@ class Dataset:
             return [folder_color for i in range(len(self.groups))]
             
     def _group_filter(self, g):
-        '''Clean Nan rows and empty groups (all nan values) and set a threshold:
+        '''Clean NaN rows and empty groups (all NaN values) and set a threshold:
             groups of less than three points are not valid.'''
         # Drop NaN rows:
         non_NaN_groups = [i.dropna(axis=0, thresh=8) for i in g]
@@ -149,18 +148,16 @@ class Dataset:
 
     def by_groups(self):
         ''' Extract all groups contained in the dataset and calculate the
-        facies parameters for one of them. The groups are made from ID-group
-        fields differences.'''
+        facies parameters for each one. A groups is generated for each distinct Group_ID.'''
         return [self.data.loc[self.data.Group_ID == i] for i in 
                 self.data.Group_ID.unique()]
         
     def by_time(self, window_size=10, freq=5):
         ''' Extract all groups contained in the dataset and calculate the
-        facies parameters for one of them. Minimum: every three points
-        '''
+        facies parameters for each one. Minimum: every three points.'''
         index = self.data.index.to_numpy()
-        assert window_size >3, "A group must be conformed by three or more points."
-        assert freq<window_size, 'Window size is wider than slicing frequency.\
+        assert window_size >3, "A window group must be conformed by three or more points."
+        assert freq<window_size, 'Window size is wider than the step length.\
              There will be analyses not taken into account'
              
         def rolling_window(array, window_size, freq):
@@ -178,21 +175,20 @@ class Dataset:
         return [self.data.iloc[i:j,:] for i,j in zip(start, end)]
    
     def _info_table(self):
-        '''Insert all diagrams' parameters into a DataFrame.'''
+        '''Incorporate all diagrams' Q-Facies indices into a DataFrame.'''
         return pd.DataFrame([j for i in self.diagrams for j in i.get_params()])
     
     def _mapa(self):
-        ''' Dictionary to map columns names '''
-        return {'Area':'Area (%)','Shape':'Shape index (%)',
-                'Angle':'Orientation ({})'.format('$^{o}$'),
-                'panel':'Panel','Blau':'Blau index (%)',
-                'points':'Points','A':'Blau (A)',
-                'B':'Blau (B)','C':'Blau (C)', 'D':'Blau (D)',
-                'Time':'Time', 'Dispersion':'Standard Distance'}
+        ''' Dictionary to map column names '''
+        return {'Area':'Ai','Shape':'Si',
+                'Angle':'Or'.format('$^{o}$'),
+                'panel':'Panel','Blau':'Bi',
+                'points':'Points',
+                'Time':'Time', 'Dispersion':'Di'}
          
     def excel(self):
-        ''' Create an Excel file with all the groups' parameters info and 
-        save it at 'Data' folder'''
+        ''' Create an Excel file with all the groups' Q-Facies indices and 
+        save it to the 'Data' folder'''
         df = self._info_table()
         df.rename(mapper=self._mapa(), axis=1, inplace=True)
         df.rename(mapper={'Orientation ($^{o}$)':'Orientation ({})'.format(u"\u00b0")},
@@ -201,12 +197,19 @@ class Dataset:
         
         # Create two dataframes
         df1 = df.set_index(['Group','Panel'])
-        df1.drop('Dominant',axis=1, inplace=True)
+        df1.drop(['A', 'B', 'C', 'D'],axis=1, inplace=True)
+        df1 = df1[list(('Points', 'Ai', 'Bi', 'Di', 'Dominant', 'Or', 'Si'))]
         
         a = df.columns.to_list()
-        [a.remove(i) for i in ('Group','Panel')]
-        df2 = df.set_index('Group').pivot(columns='Panel',values=a).swaplevel(0,1,
-                                    axis=1).sort_index(axis=1)
+        [a.remove(i) for i in ('Group','Panel', 'A', 'B', 'C', 'D')]
+        df2 = df.set_index('Group').pivot(columns='Panel',values=a).swaplevel(0,1, axis=1).sort_index(axis=1)
+        df2 = df2.reindex([('Anion', 'Points'), ('Anion', 'Ai'), ('Anion', 'Bi'), ('Anion', 'Di'),
+            ('Anion', 'Dominant'), ('Anion', 'Or'), ('Anion', 'Si'), ('Cation', 'Points'), ('Cation', 'Ai'), 
+            ('Cation', 'Bi'), ('Cation', 'Di'), ('Cation', 'Dominant'), ('Cation', 'Or'), ('Cation', 'Si'),
+            ('Diamond', 'Points'), ('Diamond', 'Ai'),('Diamond', 'Bi'), ('Diamond', 'Di'), ('Diamond', 'Dominant'), 
+            ('Diamond', 'Or'), ('Diamond', 'Si')], axis=1)
+        df2.drop(df2.columns[18], axis=1, inplace=True)
+        df2.set_index(df.Group.unique(), inplace=True)
         
         # Saving the dataframes as two different sheets of the same Excel file
         book = pd.ExcelWriter('Data\{}.xlsx'.format(self.fname))
@@ -215,7 +218,7 @@ class Dataset:
         book.save()
          
     def plotting(self, **kw):
-        '''Different representation function via 'Plot' module'''
+        '''Different representation functions via the 'plot.py' module'''
         # Create a Figure for each group if 'Figs' is set to True
         if kw['figs']:
             try:
@@ -237,31 +240,29 @@ class Dataset:
             Overlap(self.diagrams, self.way, self.fname, **kw) #['overlap_var']
             
         # Create a unique figure with ALL the points:
-        if kw['plot_all']:
-            if self.way == 'by_time':
-                df_all = Diagram(self.data, 'by_time',
-                                     self.fname).get_all_points()
-                Plot_all('by_time', self.fname, df=df_all, **kw)
-
-            elif self.way == 'by_groups':
-                Plot_all('by_groups', self.fname, diagrams=self.diagrams, **kw)
-
-class ReadDataFile:
-    '''Read the input data file, check for some decimal errors and convert
-    messures from ppm o mg/L values to percentage (epm) ones.'''
+        if kw['plot_all'] & (self.way == 'by_time'):
+            try:
+                df_all = Diagram(self.data, 'by_time', self.fname, **kw).get_all_points()
+                Plot_all(df_all, self.fname, **kw)
+            except NameError:
+                raise('Cannot graduate by time. Check the time series')
     
-    def __init__(self, fname, way, space=False, freq=None,
+class ReadDataFile:
+    '''Read the input data file, check for decimal errors, and transform
+    units of measurement from ppm or mg/l to miliequivalent percentage (epm).'''
+    
+    def __init__(self, fname, way, resample=False, resample_interval=None,
                  transform=True, **kw):
         '''fname: str
                   Filepath of the input data.
            way: str {'by_groups','by_time'}
-           space: bool, default False. Optional
-                 Only takes place when way set to 'by_time'
-           freq: str {following pandas frequency aliases} default None
+           resample: bool, default False. Optional
+                 Only considered when way = 'by_time'
+           resample_interval: str {following pandas frequency aliases} default None
                  Fore more info: https://pandas.pydata.org/pandas-docs/stable/
                  user_guide/timeseries.html#offset-aliases
            transform: bool, default True
-                     Transform ionic data from mg/L (or ppm) to % meq/L.'''
+                     Transform ionic data from mg/l (or ppm) to epm.'''
 
         self.ions=['Ca','Mg','Na','K','HCO3','CO3','SO4','Cl']
         self.cols = dict(by_groups=['Group_ID',*self.ions], by_time=['Time',*self.ions])
@@ -271,21 +272,21 @@ class ReadDataFile:
         self.df.columns = self.cols[way]
         self.formatt()
         self._converse() if transform == True else self.df
-        self.time(space, freq, agregation=kw['agregation'],
-                          format=kw['time_format']) if way=='by_time' else None
+        self.time(resample, resample_interval, agregation=kw['aggregation'],
+                          format=kw['datetime_format']) if way=='by_time' else None
         
     def get(self):
-        '''Return formated input file as a pandas DataFrame.'''
+        '''Return formated input file as a pandas DataFrame'''
         return self.df
     
     def formatt(self):
-        '''Format columns depending on 'way' parameter '''
+        '''Format columns depending on the 'way' parameter'''
         head = self.cols[self.way][0]
         
         # Replace '<' charachters for 0, since are considered bellow detection
         # limit.
         self.df[self.ions] = self.df[self.ions].applymap(lambda x:\
-             (np.nan if '<' in x else x) if (type(x) == str) else x)
+             (np.nan if '<' in x else x) if (type(x) == str) else x).astype(float)
         
         # Points are decimal separator and float values
         self.df[self.ions] = self.df[self.ions].applymap(lambda x:\
@@ -299,34 +300,31 @@ class ReadDataFile:
         if self.way=='by_groups':
             self.df[head] = self.df[head].map(lambda x: str(x))
               
-    def time(self, space, freq, agregation='mean', format='%d/%m/%Y'):
-        '''Turn time column to pandas datetime format and resample if desired'''
+    def time(self, resample, resample_interval, agregation='mean', format='%d/%m/%Y'):
+        '''Convert time column to pandas datetime format and resample if desired'''
         try:         
             self.df['Time'] = pd.to_datetime(self.df['Time'],
                               format=format, errors='raise')
-            self.df.sort_values('Time',inplace=True)
-            
         except TypeError:
-            raise("There are troubles with date format. Try to format them as \
-                   follows: 'dd-MM-YYYY' or 'dd-MM-YYYY 'hours:minutes:seconds' \
+            raise("Error in date format. Try formatting dates as \
+                   'dd-MM-YYYY' or 'dd-MM-YYYY 'hours:minutes:seconds' \
                    for higher resolution.")
                    
-        # Resample to specifed frequency if desired to be evenly spaced.
-        self.resample(freq, agregation) if space else None
+        # Resample to specifed frequency if desired to be evenly resampled.
+        self.resample(resample_interval, agregation) if resample else None
         
-    def resample(self, freq, agregation):
+    def resample(self, resample_interval, agregation):
         '''Resample via pd.resample() '''
         _trans = {'yearly':'Y','monthly':'M','weekly':'W','daily':'D'}
-        freq = _trans[freq] if freq in _trans.values() else freq
-        self.df = self.df.set_index('Time').resample(freq, origin='start') \
-                          .agg(agregation).reset_index()
+        resample_interval = _trans[resample_interval] if resample_interval in _trans.keys() else resample_interval
+        self.df = self.df.set_index('Time').resample(resample_interval, origin='start') \
+            .agg(agregation).reset_index()
     
     ###########################################################################
     # ----------- Percentage equivalents (epm) calculation --------------------
     ###########################################################################
     def _converse(self):
-        '''Convert mg/L or ppm analyses to epm values (ie, % values)
-        '''
+        '''Convert mg/l or ppm analyses to epm values (i.e., % values)'''
         # equivalent number (eq) = substance weight () * (valence (V) / molecular mass(Mm))
         # Conversion Factor (CF) = V/Mm ----> One per molecule
         
@@ -392,15 +390,14 @@ warnings.simplefilter('ignore') if kw['ignore_warnings'] else None
 
 def main():
     start = time.time()
-    D = Dataset(fname, way=way, **kw)
+    Dataset(fname, way=way, **kw)
     end = time.time()
     d = end - start
     print(
     f"Execution time: {round(d//60)} minutes and {round(d%60,2)} seconds.")
-    return D
-    
+
 if __name__ == '__main__':
-    D = main()
+    main()
     
 # =============================================================================
 # ======================== END OF THE PROGRAM =================================

@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-======================== Module of Qfacies package ============================
+======================== Module of Q-Facies package ============================
 ===============================================================================
-Contains all the visual representation methods of 
-Qfacies.
+Contains all the visual representation methods of Q-Facies.
 
-Classes that need the Piper diagram for plotting the data are subclassed from
-Skeleton (the Piper diagram skeleton class). Thesea are Overlap, Plot_Diagram
+Classes needed to plot the data in the Piper digram are subclassed from the 
+Skeleton class (the Piper diagram skeleton class). These classes are Overlap, Plot_Diagram
 and PLot_all
 
-The rest of the classes (Evolution_time and Evolution_groups), that allow to
+The rest of the classes (Evolution_time and Evolution_groups) that allow to
 represent all the extracted information in a three-graphs plot, are subclassed
-from Evolution class
+from the Evolution class.
 ===============================================================================
 ===============================================================================
 """
@@ -31,7 +30,7 @@ _extension_graph = 'png'
 _dpi = 400
 
 class Skeleton:
-    '''Create basic structure of Piper diagram.'''
+    '''Create the basic structure of the Piper diagram.'''
 
     def __init__(self):
         global _extension_graph, _dpi
@@ -78,7 +77,7 @@ class Skeleton:
         return self.diamond
    
     def _grid(self):
-        '''Reference lines within each panel. Created for every 20 units'''
+        '''Reference lines within each panel every 20 units'''
         sin, cos, offset = self.sin, self.cos, self.offset
         #######################################################################
         #######################------- Visual Grid ----------##################
@@ -214,12 +213,12 @@ class Skeleton:
 class Overlap(Skeleton):
     
     def __init__(self, diagrams, way, df_name, overlap_var='Area', **kw):
-        ''' Create a figure with all the groups information. Groups will be
-        drawn by their convex hull or centroids according to kw['overfig_way'].
-        Groups will be graduated by the values of one of the following variables:
+        ''' Create a figure with all the groups' information. Groups will be
+        drawn by their convex hull or centroids according to the argument 
+        kw['overfig_way']. Groups will be graduated by the values of one of the
+        following variables:
         'Area','Shape','Blau','Angle','Time', according to kw['overfig_var']
-        Note that 'Time' only available if way=='by_time'.
-        '''
+        Note that 'Time' is only available if way=='by_time'.'''
                 
         super().__init__()
         self.kw_format = kw
@@ -246,7 +245,7 @@ class Overlap(Skeleton):
         self.layout()
         
     def extract_pols(self):
-        '''Extract polygons and its values and keep it in a plt.Collection'''
+        '''Extract polygons and their values and keep them in a plt.Collection'''
         pols = [plt.Polygon(j.Params.ch_points) for
                 i in self.diagrams for j in i.panels]
         values = np.array([j.Params.get()[self.overlap_var] for i in
@@ -268,7 +267,7 @@ class Overlap(Skeleton):
         self.col, self.values = col, values
    
     def extract_centroid(self):
-        '''Extract polygons and its values and keep it in a plt.Collection'''
+        '''Extract polygons and their values and keep them in a plt.Collection'''
         points = [j.Params.centroid() for i in self.diagrams for j in i.panels]
         df_pts = pd.DataFrame(points, columns=['X','Y'])
             
@@ -328,7 +327,7 @@ class Overlap(Skeleton):
                          bbox_inches = 'tight', pad_inches=0, dpi=400)
 
 class Plot_Diagram(Skeleton):
-    ''' Class that allows to plot all Piper diagram information'''
+    ''' Class that allows to plot all the Piper diagram information'''
     
     def __init__(self, panels, name, way, df_name,
                  labelling=False, df=None, **kw):
@@ -403,7 +402,7 @@ class Plot_Diagram(Skeleton):
         self.ax.add_collection(line_col)
         
     def info(self):
-        '''Plot the facies' indexes of each group as a text box.'''
+        '''Plot the facies' indeces of each group as a text box.'''
         fancy_kw = dict(lw=0.2, pad=0.5)
         box_kw   = dict(boxstyle='round', facecolor='#F3F3F3',**fancy_kw)
         kw_text  = dict(transform=self.ax.transAxes, va='center', bbox=box_kw, 
@@ -428,7 +427,7 @@ class Plot_Diagram(Skeleton):
                      if (self._check_outlier() & self.kw_format['lof']) else None
     
     def layout(self):
-        '''Layout propertires: saving plot and closing figure'''
+        '''Layout properties: saving plot and closing figure'''
         self.fig.savefig(f"Graphics/{self.name}_{self.df_name}.{self._extension_graph}",
                          bbox_inches = 'tight', pad_inches=0, dpi=self._dpi)
         plt.close()
@@ -444,34 +443,23 @@ class Plot_Diagram(Skeleton):
 
 class Plot_all(Skeleton):
     
-    def __init__(self, way, df_name, df=None,
-                        diagrams=None, **kw):
+    def __init__(self, df, df_name, **kw):
         ''' Plot all the dataset points and graduate them by time.
         Only available if way == 'by_time'. '''
         super().__init__()
-        self.df_name = df_name
+        self.df, self.df_name = df, df_name
+        
         # Points features:
         cmap = cm.get_cmap(kw['cmap_name'])
         cmap = cmap.reversed() if kw['cmap_reversed'] else cmap
         kw = {'s':8, 'alpha':0.8, 'cmap':cmap, 'lw':0, 'zorder':3}
 
-        if way=='by_time':
-            self.df = df
-            self.df['Time_fmt'] = mdates.date2num(self.df['Time'])       
+        self.df['Time_fmt'] = mdates.date2num(self.df['Time'])       
 
-            self.scatt = self.ax.scatter(df['X'], df['Y'], c=df['Time_fmt'], **kw)
-            self.scatt.set_clip_path(self.get_clip_path())
-            self.colorbar();  self.layout(way)
-
-        elif way=='by_groups':
-            dfs = [i.get_all_points() for i in diagrams]
-
-            [self.ax.scatter(i['X'], i['Y'],
-                    label=i['Group_ID'].iloc[0], **kw
-                    ).set_clip_path(self.get_clip_path())
-                    for i in dfs]
-            self.layout(way)
-
+        self.scatt = self.ax.scatter(df['X'], df['Y'], c=df['Time_fmt'], **kw)
+        self.scatt.set_clip_path(self.get_clip_path())
+        self.colorbar();  self.layout()
+        
     def colorbar(self):
         '''Colorbar'''
         cbaxes = self.fig.add_axes([0.21, 0.5, 0.025,0.3])
@@ -487,34 +475,24 @@ class Plot_all(Skeleton):
         cbar.solids.set_edgecolor("face")  # Do not draw edge lines
         cbar.ax.set_yticklabels(ticklabels)
                
-    def layout(self, way):
+    def layout(self):
         '''Figure layout'''
         # Information plot on the figure:
-
-        if way=='by_time':
-            text= "Graduation of all data-file\npoints according to {}.\
-            ".format(r'$\bf{Time}$')
-
-        else:
-            text= "Display of all dataset {}".format(r'$\bf{groups}$')
-            #-------------------------- Legend ------------------------------------
-            legend = self.ax.legend(loc = 'upper right', bbox_to_anchor = (0.95, 0.86),
-                      frameon = False, ncol = 1, fontsize = 6, handletextpad = 0.6)
-
-
+        text= "Graduation of all data-file\npoints according to {}.\
+        ".format(r'$\bf{Time}$')
         self.ax.text(-15, 196,text,fontsize=5, linespacing=1.5)
         self.ax.text(155, 200, f"Dataset: ${self.df_name}$",
-                 fontsize=6, linespacing=1.5)
+                     fontsize=6, linespacing=1.5)
         # Saving figure at 'Graphics'
         self.fig.savefig(f'Graphics/All points_{self.df_name}.{self._extension_graph}',
                          bbox_inches = 'tight', pad_inches=0, dpi=400)
 
 class Evolution:
-    '''Create a three-graphs plot with all the indexes info.'''
+    '''Create a three-graphs plot with all the indeces info.'''
     
     def __init__(self, diagrams, df, df_name, way, mapa_dict):
-        ''' Take all groups' params and plot them throughout time or by groups
-            depending on the classifier method ('way') '''
+        ''' Take all groups' parameters and plot them through time or by groups
+            depending on the classifying method ('way') '''
         self.fig, self.ax = plt.subplots(3, figsize=(20,17), sharex=True, sharey=True)
         self.ax = self.ax.tolist()
         self.axt = [i.twinx() for i in self.ax]
@@ -526,6 +504,7 @@ class Evolution:
         self.mapping = dict(Area='#DC2828',  # Red
                             Shape='#4178D4', # Blue
                             Blau='#32A941',  # Green
+                            Dispersion='pink',  # Pink
                             Angle='orange')  # Orange
         
     def legend(self, way, zoom10=False, zoom100=False):
@@ -541,7 +520,7 @@ class Evolution:
             
         labels = map(self.mapa_dict.get, labels)
         self.fig.legend(handles, labels,bbox_to_anchor=(0.42,0.76,0.2,0.2),
-                   loc= 'upper center',fontsize= 20, ncol=4, borderpad=0.5)
+                   loc= 'upper center',fontsize= 20, ncol=5, borderpad=0.5)
         
         # Plot aditional info if some ts is zoomed:
         self.fig.text(0.3,0.14, 'Dashed line (---):   zoomed x10', ha='center',
@@ -572,7 +551,7 @@ class Evolution:
             dpi=400, facecolor='#E1E1E1', bbox_inches = 'tight', pad_inches=1)
         
 class Evolution_time(Evolution):
-    '''Represent groups' indexes as temporal series.'''
+    '''Represent groups' indeces as time series.'''
     
     def __init__(self, diagrams, df, df_name, way, mapa_dict):
         
@@ -596,7 +575,7 @@ class Evolution_time(Evolution):
         self.df = self.df.sort_values('Time').drop(['Onset','End','Group'],
                                                     axis=1).set_index('Time')
     def _lines(self, var, **kw):
-        '''Plot the variable time-series on each panel iteratively'''
+        '''Plot the variable time series on each panel iteratively'''
         # Define pandas plotting keywargs:
         kw_com = dict(lw=2, label=var, legend=False, xlabel='', **kw)
         kw_com = dict(ylabel='%', ylim=(0,100), **kw_com) if var!='Angle' else \
@@ -609,7 +588,7 @@ class Evolution_time(Evolution):
         side = self.axis[0] if var!='Angle' else self.axis[1]
         
         def check(ts, column):
-            '''Check temporal series and zoom by 10 if max(ts) < 10.'''
+            '''Check time series and zoom by 10 if max(ts) < 10.'''
             if (ts[column].max() < 10) & (ts[column].mean() != 0):
                 ts[column] = ts[column]*10
                 zoom = True
@@ -635,7 +614,7 @@ class Evolution_time(Evolution):
             self.zooms100.append(zoomx100)
         
     def _ticks(self, way):
-        '''Format ticks of axis figure depending on 'way' param chosen.'''
+        '''Format ticks of axis figure depending on the chosen 'way' parameter.'''
         ax, axt = self.ax, self.axt
         # Y-axis format:
         [i.set_yticks(range(0,101,20)) for i in ax]
@@ -653,14 +632,14 @@ class Evolution_time(Evolution):
         ax[2].xaxis.set_minor_formatter(months_fmt)
 
         ax[2].set_xlim(self.df.index.min(),self.df.index.max())
-        ax[2].tick_params(axis='x',labelrotation=0, pad=12)
+        ax[2].tick_params(axis='x',labelrotation=30, pad=12)
         [i.set_horizontalalignment('center') for i in ax[2].get_xticklabels()]
         
         # Erase month ticks set wrongly on the first and second plot
         [ax[i].xaxis.set_ticks_position('none')  for i in (0,1)]
         
 class Evolution_groups(Evolution):
-    '''Represent groups' indexes as stacked bar histograms'''
+    '''Represent groups' indeces as stacked bar histograms'''
     
     def __init__(self, diagrams, df, df_name, way, mapa_dict):
         super().__init__(diagrams, df, df_name, way, mapa_dict)
@@ -668,8 +647,8 @@ class Evolution_groups(Evolution):
         self.hist(); self.legend(way); self.ticks(way); self.layout();
         
     def hist(self):
-        '''Plot the variable time-series on each panel iteratively'''
-        d = pd.pivot_table(self.df,values=['Area','Shape','Blau','Angle'],
+        '''Plot the variable time series on each panel iteratively'''
+        d = pd.pivot_table(self.df,values=['Area','Shape','Blau','Dispersion','Angle'],
                             index='Group', columns=['Panel'])
         d.sort_index(inplace=True) # Sort the index on the way pandas does.
 
@@ -679,7 +658,7 @@ class Evolution_groups(Evolution):
                       legend=False, xlabel='')
         
     def ticks(self, way):
-        '''Format ticks of axis figure depending on 'way' param chosen.'''
+        '''Format ticks of axis figure depending on the chosen 'way' parameter.'''
         [i.remove() for i in self.axt]
 
         # Axis labels format

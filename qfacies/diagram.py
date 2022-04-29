@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 """
 ===============================================================================
-======================== Module of Qfacies package ============================
+======================== Module of Q-Facies package ============================
 ===============================================================================
-Contains all the classes related to the elements
-of the diagrams.
-A diagram is always conformed by three panels: Cation, Anion and Diamond, 
-all of them subclassed from Panel class and associated at Diagram class.
+Contains all the classes related to the elements of the diagrams.
+A diagram is always conformed by three panels: Cation, Anion and Diamond (each 
+one subclassed from Panel class and associated at Diagram class)
 
-All euclidean transformations requiered for each panel are imported from
-Calculous module.
+All euclidean transformations requiered for each panel are imported from the
+'calculation.py' module.
 
-All plotting methods for visual representation are imported from Plot module.
+All plotting methods for visual representation are imported from the 'plot.py' module.
 
 ===============================================================================
 ===============================================================================
@@ -19,16 +18,18 @@ All plotting methods for visual representation are imported from Plot module.
 
 import pandas as pd
 from plot import Plot_Diagram
-from calculous import Indixes, Transform
+from calculation import Indixes, Transform
 
 class Diagram:
     ''' Contains all the information of a classical Piper Diagram'''
     
-    def __init__(self, df, way, df_name, pol_color='#F395A6', **kw):
-        ''' Create an object for Cation, Anion and Diamond panels, and keep
-        them into a tuple.'''
+    def __init__(self, df, way, df_name, pol_color='orange', **kw):
+        ''' Create an object for the Cation, Anion and Diamond panels, and store
+        them in a tuple.'''
         self.df, self.way, self.kw  = df, way, kw
         self.df_name, self.pol_color = df_name, pol_color
+        self.df.dropna(inplace=True)
+        #self.df.fillna(0, inplace=True) # same results as dropna
         # Classes agregation:
         self.cation = Cation(df, **kw)
         self.anion = Anion(df, **kw)
@@ -44,13 +45,13 @@ class Diagram:
         
     def plot(self):
         ''' Plot the Piper diagram with all the information.
-            Executed via Plot module'''
+            Executed via the 'plot.py' module'''
         Plot_Diagram(self.panels, name=self.__str__(),
                  way=self.way, df_name=self.df_name,
                  pol_color=self.pol_color, **self.kw)
         
     def get_params(self):
-        '''Return a list of dicts with all panels' parameters.'''
+        '''Return a list of dicts with all panels' indices.'''
         d_params = [i.Params.get() for i in self.panels]
         name = '{} to {}'.format(*[i.strftime(format='%d-%m-%Y') \
                        for i in self.__str__()]) if              \
@@ -60,7 +61,7 @@ class Diagram:
         return d_params
     
     def get_all_points(self):
-        ''' Get all points of Piper program. Columns: xy coordinates and 'ID'
+        ''' Get all points of the Piper diagram. Columns: xy coordinates and 'ID'
         group or Date column.
         Return a pandas.DataFrame'''
         column = dict(by_time='Time', by_groups='Group_ID')
@@ -73,10 +74,9 @@ class Panel:
         self.df = df
 
     def get_column(self, column):
-        ''' Get points of this panel with its XY coordinates and ANOTHER
-        column (introduced by 'keep_column' arg). Created to represent points
-        according to a third variable throughout Diagram class'''
-        
+        ''' Get points of this panel with their XY coordinates and ANOTHER
+        column (introduced by the 'keep_column' arg). Created to represent points
+        according to a third variable inside the Diagram class'''        
         a = pd.DataFrame(self.points, columns=['X','Y'])
         b = self.df.copy().reset_index(drop=True)[[column]]
         return pd.concat([a,b], axis=1)
@@ -85,19 +85,17 @@ class Cation(Panel):
     '''Contains all cation panel data and methods'''
      
     def __init__(self, df, params=True, **kw):
-        '''params: boolean Default True. Calculate all params throughout
-        Indices class'''
+        '''params: boolean Default True. Calculate all the indices with the
+        Indixes class'''
         super().__init__(df)
         self.panel = 'cation'
-        self.components = ['NaK_epm','Mg_epm'] 
-        points = self.transform(df.filter(items=self.components).to_numpy())
-        self.points=points
-        self.Params = Indixes(points, df, self.panel, **kw)
+        self.components = ['NaK_epm','Mg_epm']
+        self.points = self.transform(df.filter(items=self.components).to_numpy())
+        self.Params = Indixes(self.points, df, self.panel, **kw)
 
     def transform(self, points):
         ''' Make all the required euclidean transformation to the panel's
-        points via matrixes-product (@)
-        '''
+        points via matrixes-product (@)'''
         T = Transform()
         return points @ T.scale() @ T.t_shear()
     
@@ -119,18 +117,17 @@ class Anion(Panel):
     '''Contains all anion panel data and methods'''
     
     def __init__(self, df, params=True, **kw):
-        '''params: boolean Default True. Calculate all params throughout Indices class'''
+        '''params: boolean Default True. Calculate all the indices with the
+        Indixes class'''
         super().__init__(df)
         self.panel = 'anion'
         self.components = ['Cl_epm','SO4_epm']
-        points = self.transform(df.filter(items=self.components).to_numpy())
-        self.points=points
-        self.Params = Indixes(points, df, self.panel, **kw)
+        self.points = self.transform(df.filter(items=self.components).to_numpy())
+        self.Params = Indixes(self.points, df, self.panel, **kw)
 
     def transform(self, points):
         ''' Make all the required euclidean transformation to the panel's
-        points
-        '''
+        points'''
         T = Transform()
         return (points @ T.scale() @ T.t_shear()) + T.a_translation()
 
@@ -151,20 +148,19 @@ class Anion(Panel):
 class Diamond(Panel):
     '''Contains all diamond panel data and methods'''
     def __init__(self, df, params=True, **kw):
-        '''params: boolean Default True. Calculate all params throughout Indices class'''
+        '''params: boolean Default True. Calculate all the indices with the
+        Indixes class'''
         super().__init__(df)
         self.panel = 'diamond'
         self.components = ['NaK_epm','HCO3CO3_epm']
         points = df.filter(items=self.components)
         points['HCO3CO3_epm']= points['HCO3CO3_epm'].map(lambda x: 100 - x)
-        points = self.transform(points.to_numpy())
-        self.points=points
-        self.Params = Indixes(points, df, self.panel, **kw) if params else None
+        self.points = self.transform(points.to_numpy())
+        self.Params = Indixes(self.points, df, self.panel, **kw) if params else None
         
     def transform(self, points):
         ''' Make all the required euclidean transformation to the panel's
-        points
-        '''
+        points'''
         T = Transform()
         p_trans = (
         points @ T.scale() @ T.d_shear() @ T.rotation() ) + T.d_translation()
