@@ -1,0 +1,208 @@
+; ===============================================================================
+; ===================== OPTIONS FILE for Q-Facies package =======================
+; ===============================================================================
+; This file defines the options for running Q-Facies on a specifed dataset.
+; It is essential to comply with format options to avoid errors in program execution.
+
+; ===============================================================================
+; ============================ 2.1 GENERAL OPTIONS ==============================
+; ===============================================================================
+; 2.1.1 -------------------------------------------------------------------------
+; Name of the input file (including extension).It must be stored in the 'Data' folder.
+fname="serie.txt"
+
+; 2.1.2 -------------------------------------------------------------------------
+; Way of analyzing the dataset:'by_groups','by_time'
+way='by_time'
+
+; 2.1.3 -------------------------------------------------------------------------
+; Transform concentrations to percentage of meq/l
+; True if the input data is in mg/l or ppm, and False if it is already in % meq/l
+transform=True
+
+; 2.1.4 -------------------------------------------------------------------------
+; Whether to consider outlier points or not. True or False
+; Outliers detection is computed in two steps:
+; _._In the first step, a preliminary detection of outliers is done with
+;    an unsupervised outlier detection method: Local Outlier Factor (LOF,
+;    from sklearn library). For more info, visit:
+;    https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.LocalOutlierFactor.html
+; _._In the second step, these outliers are checked and only those outside the convex
+;    hull polygon will be discarded.
+lof=True
+
+; 2.1.5 -------------------------------------------------------------------------
+; Number of surrounding points taken into account while computing the LOF algorithm.
+; Note that the lower this value is, the more points will be considered as outliers.
+; If n_neighbors is larger than the number of samples provided, all samples will be used.
+lof_neighbours=15
+
+; 2.1.6 -------------------------------------------------------------------------
+;Create an Excel with the output information (saved to the 'Data' folder). 
+excel=True
+
+; ===============================================================================
+; ========================== 2.2 Time analysis options ==========================
+; ===============================================================================
+; Time series options are only considered when way='by_time'
+; The file "How_to_QFacies.pdf" shows graphically the meaning of each variable
+; considered in this section.
+
+; 2.2.1 -------------------------------------------------------------------------
+; Specify the dates format. For more info, visit:
+; https://www.dataindependent.com/pandas/pandas-to-datetime/
+datetime_format = '%d/%m/%Y'
+
+; 2.2.2 -------------------------------------------------------------------------
+; Width of the rolling window to create temporal groups. Positive integer.
+; It has to be greater than three, which is the minimum number required
+window_size=72
+
+; 2.2.3 -------------------------------------------------------------------------
+; Size of the step for the rolling window. Positive integer.
+step_length=48
+
+; 2.2.4 -------------------------------------------------------------------------
+; Fill out this section only if you want to resample the series 
+; Resample the time series to regular intervals?
+resample=True
+
+; 2.2.5 -------------------------------------------------------------------------
+; Fill out this section only if you want to resample the series 
+; -------------------------------------------------------------------------------
+; Frequency of time series intervals. Only considered when resample=True.
+; Supported string aliases can be found at: 
+; https://pandas.pydata.org/pandas-docs/stable/user_guide/timeseries.html#offset-aliases  
+; A custom frequency can be made by preceding the day acronym by an integer. 
+; e.g.: every-17-days = '17D'
+; A more detailed explanation can be found in the "How_to_QFacies.pdf" file
+; e.g.: 'yearly'or 'Y', 'monthly'or 'M', 'weekly' or 'W', 'daily' or 'D'
+resample_interval='M'
+
+; 2.2.6 -------------------------------------------------------------------------
+; Fill out this section only if you want to resample the series 
+; -------------------------------------------------------------------------------
+; Resampling aggregation method: 'mean','last','first'
+aggregation='last' 
+
+; ===============================================================================
+; =========================== 2.3 Graphic Options ===============================
+; ===============================================================================
+; All the output graphics will be stored in the 'Graphics' folder.
+; The color scheme to be used in the different elements can be specifed in two ways: 
+; a) Following Matplotlib nomenclature (see https://matplotlib.org/stable/gallery/color/named_colors.html) E.g. 'blue'
+; b) Following HEX nomenclature. E.g. '#BB2EB3'
+
+; 2.3.1 -------------------------------------------------------------------------
+; Plot outliers points (note that they are not considered for indices calculations)
+plot_outliers=True
+
+; 2.3.2 -------------------------------------------------------------------------
+; Color of outliers points.
+color_outliers='Red'
+
+; 2.3.3 -------------------------------------------------------------------------
+; Point size. This size will be apply to all plotted points. Positive integer.
+point_size=8
+
+; 2.3.4 -------------------------------------------------------------------------
+; Points transparency. Float between 0 (transparent) and 1 (opaque)
+point_transparency=0.8
+
+; 2.3.5 -------------------------------------------------------------------------
+; Color of the points that conform the convex hull.
+color_outter_points='black'
+
+; 2.3.6 -------------------------------------------------------------------------
+; Color of the points that lay within the convex hull.
+color_inner_points='grey'
+
+; 2.3.7 -------------------------------------------------------------------------
+; Regression line width. Float.
+line_lw=0.5
+
+; 2.3.8 -------------------------------------------------------------------------
+; Regression line color.
+line_color='#47a0b3'
+
+; 2.3.9 -------------------------------------------------------------------------
+; Convex hull transparency. Float between 0 (transparent) and 1 (opaque).
+pol_transparency=1
+
+; 2.3.10 ------------------------------------------------------------------------
+; Line width of the convex hull polygon. Float.
+pol_lw=0.5
+
+; 2.3.11 ------------------------------------------------------------------------
+; Line color of the convex hull polygon.
+pol_ec='yellow'
+
+; 2.3.12 ------------------------------------------------------------------------
+; Color palette that will be used in the figures.
+; Examples: 'Greens', 'Greys', 'Blues', 'Reds', 'YlOrBr', 'Spectral', etc.
+; Many more options are available at:
+; https://matplotlib.org/stable/tutorials/colors/colormaps.html
+cmap_name='YlOrBr'
+
+; 2.3.13 ------------------------------------------------------------------------
+; Optional color to plot the figures in the 'Graphics' folder.
+; This could be done attending to a specific color or a color palette.
+folder_color='green'
+
+; 2.3.14 ------------------------------------------------------------------------
+; Whether to reverse the color palette or not. True or False.
+cmap_reversed=False
+
+; 2.3.15 ------------------------------------------------------------------------
+; Clip the regression lines attending to the panels' edges. True or False.
+clip_lines=False
+
+; 2.3.16 ------------------------------------------------------------------------
+; Figure's resolution (in dots per inch). Positive integer.
+dpi=400
+
+; 2.3.17 ------------------------------------------------------------------------
+; Output graphic format: 'jpg', 'png', 'svg', 'pdf', 'ps' 
+extension_graph='png'
+
+; ===============================================================================
+; =========================== 2.4 Visual Methods ================================
+; ===============================================================================
+
+; 2.4.1 -------------------------------------------------------------------------
+;Create a Piper diagram per group with all the indices information. 
+figs=True 
+
+; 2.4.2 -------------------------------------------------------------------------
+; Create a Piper diagram including all the convex hulls of the dataset. 
+overlap_fig=True
+
+; 2.4.3 -------------------------------------------------------------------------
+; Choose the variable in which to graduate de 'overlap_fig' figure.
+; Options: 'Area', 'Shape', 'Blau','Angle', 'Time', 'Dispersion'.
+overlap_var='Time'
+
+; 2.4.4 -------------------------------------------------------------------------
+; Choose whether to represent the polygon of the convex hull or its centroid at 
+; overlap_fig. Options:'centroids', 'polygons'.
+overlap_way='polygons'
+
+; 2.4.5 -------------------------------------------------------------------------
+; Create a figure composed by three plots (one per panel) with the information
+; of all the indices.
+; When way='by_time', each plot shows the indices' temporal evolution.
+; When way='by_groups', each plot shows a stacked bars histogram.
+evolution_fig=True
+
+; 2.4.6 -------------------------------------------------------------------------
+; Create a figure with all the points graduated by date. 
+; Only available when way='by_time'. cmap_name will be used as color palette.
+plot_all=True
+
+; ===============================================================================
+; ============================== 2.5 Other Options ==============================
+; ===============================================================================
+
+; 2.5.1 -------------------------------------------------------------------------
+; Ignore all execution warnings. 
+ignore_warnings=True
