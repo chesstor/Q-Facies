@@ -46,7 +46,7 @@ It is essential to comply with the file format to avoid execution errors.
 The file How_to_Q_Facies.pdf describes, step by step, how to use the Q-Facies program and the meaning of each of the variables and parameters contained in the Options.txt file.
 
 ## Authors
-All authors belong to IGME Geological Survey of Spain. C/Ríos Rosas 23, 28003 Madrid, Spain
+All authors belong to the Geological Survey of Spain: Instituto Geológico y Minero de España (IGME), CSIC, Ríos Rosas, 23, 28003 Madrid, Spain
 
 * M. González-Jiménez         miguigonn@gmail.com
 
