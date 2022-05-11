@@ -58,4 +58,4 @@ All authors belong to the Geological Survey of Spain: Instituto Geológico y Min
 
 
 ## Copyright
-License: GPLv3 
+License: GNU General Public License v3.0 
