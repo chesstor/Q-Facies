@@ -8,31 +8,33 @@ To make a D-Piper diagram just follow these steps:
 ### 1. Prepare the file structure:
 Keep the file structure as shown in the figure:
 
-<img align="center" width="60%"  src="Readme_images/Image1.png">
+![image](https://user-images.githubusercontent.com/12763571/167836289-92ec2385-87f6-425b-8d7d-dbb9c7f3ebf9.png)
 
- * The input analytical data files must be saved in the *Data* folder. The sample files used in the article to make Figures 2, 3, 4 and 5 can be found in this folder.
- * The D-Piper diagrams will be saved in the *Graphics* folder. It currently contains some example images.
- * The file *D_Piper_v1_options.txt* contains the necessary instructions and explanations to build the desired D-Piper diagram.
- * The file *D_Piper_v1.py* is the script that you have to run in Python to build a D-Piper diagram. The script is widely commented.
- * The *Tools.py* file is an auxiliary Python code that act as a module and contains all the functions with which the *D_Piper_v1.py* file operates.
+
+ * The input analytical data files must be saved to the *Data* folder. The sample files used in the article to make Figures 2, 3, 4 and 5 can be found in this folder.
+ * The Q-Facies plots will be saved to the *Graphics* folder. It currently contains some example images from the paper and the How_to_Q_Facies.pdf reference guide file.
+ * The file *main.py* is the Python script to be run to generate the Q-Facies tables and graphics.
+ * The file *calculation.py* contains two classes that allow to apply all the Euclidean transformations required and to calculate all of the indices for each panel, as well as to identify outliers.
+ * The file *diagram.py* contains all the classes related to the elements of the diagrams. A diagram is always conformed by three panels: Cation, Anion and Diamond, all of them subclassed from the Panel class and bound together with the Diagram class.
+ * The file *plot.py* contains all the graphic methods of Q-Facies. 
+ * The file *Options.txt*, necessary to run the *main.py* script, contains the contains the different options for executing the program and commented help text with the description of variables and parameters.
  
 Do not delete or change any of the above files or folders. If necessary, you can add other folders or files. Note that automatically a *pycache* folder is created, requiered for an optimal execution of the program.
  
-The script always reads the drawing options from the *D_Piper_v1_options.txt* file. If you want to save a set of options, you must do so by renaming the file or saving it to another location. For further use, you will have to name it as the original one (*D_Piper_v1_options.txt*) or update the new name in line 65 of the *D_Piper_v1.py* file.
+The script always reads the options from the *Options.txt* file. If you want to save a set of options, you must rename the file or save it to another location. You will have to name it as the original one (*Options.txt*) or update the new name in line 51 of the *main.py* file for further use.
 
 ### 2. Preparing the data file:
 
-The data file must be in ASCII format and saved in the *Data* folder.
+The data file must be in ASCII format and saved to the *Data* folder as .txt or .csv.
 The data file can have any name.
 The structure of the data file should be as follows:
 
 * TAB-separated ASCII file
-* It must contain ten columns:
+* It must contain 9 columns:
       
-<img align="center" width="80%" src="Readme_images/Image2.png">
+![image](https://user-images.githubusercontent.com/12763571/167825027-c10d289b-b607-4b97-a126-b45ec71b560f.png)
 
-*Identifier*: sample identification number.<br>
-*Group*: Each sample can belong to a different group. Up to nine groups can be differentiated. Although no error will be shown, setting more groups will create overlap problems.<br>
+*Group/Date*: Each sample can belong to a different group (e.g., geographical area) or alterbatively a time series .
 *Eight columns with analytical results*. The ion content should be expressed in mg/L (milligrams per liter) or ppm (parts per million).<br>
 
 ### 3. Preparing the _Options_ file:
