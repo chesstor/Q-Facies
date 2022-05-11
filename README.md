@@ -1,7 +1,7 @@
 # Qfacies - A tool for the quantitative interpretation of spatial and temporal distribution of hydrochemical facies
 
 ## Overview
-D-Piper is a free source code developed in Python 3 that allows to represent large hydrochemical data sets throughout point density diagrams. Multiple methods of data distribution can be chosen for data visualization.
+Q-Facies is a method for quantitative spatiotemporal analysis of hydrochemical facies based on their spatial distribution in the panels of the Piper diagram
 
 ## How does it work?
 To make a D-Piper diagram just follow these steps:
