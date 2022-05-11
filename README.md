@@ -34,18 +34,16 @@ The structure of the data file should be as follows:
       
 ![image](https://user-images.githubusercontent.com/12763571/167825027-c10d289b-b607-4b97-a126-b45ec71b560f.png)
 
-*Group/Date*: Each sample can belong to a different group (e.g., geographical area) or alterbatively a time series .
-*Eight columns with analytical results*. The ion content should be expressed in mg/L (milligrams per liter) or ppm (parts per million).<br>
+*Group/Date*: Each sample can belong to a different group (e.g., geographical area), or a time series of a single sampling point (e.g., well) can be provided for temporal analysis.<br>
+*Eight columns with analytical results*. The ion content should be expressed in mg/L (milligrams per liter) or ppm (parts per million), or directly in percentage milliequivalents (%epm).<br>
 
 ### 3. Preparing the _Options_ file:
 
-The *D_Piper_v1_options.txt* file must be in ASCII format, separated by semicolon (;)
+The *Options.txt* file must be in ASCII format.
 It is a self-explanatory file that shows all the options of the program.
 It is essential to comply with the file format to avoid execution errors.
 
-The contents of this file are explained at the end of this document. Options that can be modified are shown in red, explanatory text and guidelines are shown in blue, and variable names in black.
-
-<img width="100%" src="Readme_images/Image3.svg">
+The file How_to_Q_Facies.pdf describes, step by step, how to use the Q-Facies program and the meaning of each of the variables and parameters contained in the Options.txt file.
 
 ## Authors
 All authors belong to IGME Geological Survey of Spain. C/Ríos Rosas 23, 28003 Madrid, Spain
@@ -56,7 +54,7 @@ All authors belong to IGME Geological Survey of Spain. C/Ríos Rosas 23, 28003 M
 
 * H. Aguilera Alonso          h.aguilera@igme.es
 
-* E. Díaz Losada              elisabeth.diaz@igme.es
+* A. Romero                   a.romero@igme.es
 
 
 ## Copyright
