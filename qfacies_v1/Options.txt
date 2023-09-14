@@ -9,7 +9,7 @@
 ; ===============================================================================
 ; 2.1.1 -------------------------------------------------------------------------
 ; Name of the input file (including extension) located in the 'Data' folder. String.
-fname="grupos.txt"
+fname="groups_example.txt"
 
 ; 2.1.2 -------------------------------------------------------------------------
 ; Way of analyzing the dataset. String.
@@ -29,7 +29,7 @@ transform=True
 ;    https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.LocalOutlierFactor.html
 ; _._In the second step, these outliers are checked and only those outside the convex
 ;    hull polygon will be discarded.
-lof=True
+lof=False
 
 ; 2.1.5 -------------------------------------------------------------------------
 ; Number of surrounding points taken into account while computing the LOF algorithm. Positive integer.
@@ -135,7 +135,7 @@ pol_lw=0.5
 
 ; 2.3.11 ------------------------------------------------------------------------
 ; Line color of the convex hull polygon. String.
-pol_ec='yellow'
+pol_ec='black'
 
 ; 2.3.12 ------------------------------------------------------------------------
 ; Color palette that will be used in the figures. String.
@@ -147,7 +147,7 @@ cmap_name='YlOrBr'
 ; 2.3.13 ------------------------------------------------------------------------
 ; Optional color to plot the figures in the 'Graphics' folder. String.
 ; This could be done attending to a specific color or a color palette.
-folder_color='green'
+folder_color='limegreen'
 
 ; 2.3.14 ------------------------------------------------------------------------
 ; Whether to reverse the color palette or not. Boolean.
@@ -181,7 +181,7 @@ overlap_fig=True
 ; 2.4.3 -------------------------------------------------------------------------
 ; Choose the variable in which to graduate de 'overlap_fig' figure. String.
 ; Options: 'Area', 'Shape', 'Blau','Angle', 'Time', 'Dispersion'.
-overlap_var='Time'
+overlap_var='Area'
 
 ; 2.4.4 -------------------------------------------------------------------------
 ; Choose whether to represent the polygon of the convex hull or its centroid at overlap_fig. String.
@@ -205,4 +205,4 @@ plot_all=True
 
 ; 2.5.1 -------------------------------------------------------------------------
 ; Ignore all execution warnings. Boolean. 
-ignore_warnings=True
+ignore_warnings=False

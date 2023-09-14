@@ -3,8 +3,50 @@
 ## Overview
 Q-Facies is a method for quantitative spatiotemporal analysis of hydrochemical facies based on their spatial distribution in the panels of the Piper diagram
 
+## How to install
+
+The program could be easily **installed** in a **Windows** system by:
+
+* **Download** and unzip the repositoy [*zip file*](https://github.com/chesstor/Q-Facies/archive/refs/heads/main.zip) in your working directory.
+
+or
+* **Cloning** the repository using git*:
+    `git clone https://github.com/chesstor/Q-Facies.git`
+
+
+Q-Facies have been programmed using **Python `3.7`**, and depends mainly on common Python packages.
+
+For installing, running and managing Python packages, we recommend using [Anaconda](https://docs.anaconda.com/free/anaconda/install/windows/) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html#windows-installers) distribution. The latter is a lighter release of Anaconda. 
+
+For avoiding conflicts among the dependencies and Python versions while running Q-Facies, it's recommended to create a **new conda environment** with the same Python and packages versions in which it was programmed. You can do this by:
+
+* **Option 1**. [*Manually*](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-with-commands) from the Anaconda Prompt by running:
+
+    `conda create -n qfacies python=3.7 numpy=1.19.2 pandas=1.3.0 matplotlib=3.3.2 openpyxl git`
+
+	`pip install scikit-learn==0.23.2`     # *This line after activating the env*
+
+    The library `openpyxl` is also included since it's needed for Excel creation and not always included in `pandas` installation. The use of *pip* is highly recommended for sckikit-learn installaion for avoiding a bad installation of the `scipy` dependency (see regarding error [here](https://stackoverflow.com/questions/39020361/python-scipy-module-import-error-due-to-missing-ufuncs-dll)).
+
+or
+
+* **Option 2**. From an [*yml file*](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file) using the *qfacies.yml* file included in the repository. This option will create an environment with all the packages and its versions included in the file. The first line of the *yml* file sets the new environment's name. Be free to change it for other env name.  Simply run the following line on the Anaconda Prompt from within the folder that holds the *yml* file:
+
+    `conda env create -f qfacies.yml`
+
+## Dependecies:
+The program relies on Python standard libraries.
+
+_ `Numpy 1.19.2`
+
+_ `Pandas 1.3.0`
+
+_ `Matplotlib 3.3.2`
+
+_ `Scikit-learn 0.23.2`
+
 ## How does it work?
-To make a D-Piper diagram just follow these steps:
+To make a Q-Facies diagram just follow these steps:
 ### 1. Prepare the file structure:
 Keep the file structure as shown in the figure:
 
@@ -48,7 +90,7 @@ The file How_to_Q_Facies.pdf describes, step by step, how to use the Q-Facies pr
 ## Authors
 All authors belong to the Geological Survey of Spain: Instituto Geológico y Minero de España (IGME), CSIC, Ríos Rosas, 23, 28003 Madrid, Spain
 
-* M. González-Jiménez         miguigonn@gmail.com
+* M. González-Jiménez         miguel.gj@ipna.csic.es
 
 * L. Moreno Merino            l.moreno@igme.es
 
@@ -56,6 +98,11 @@ All authors belong to the Geological Survey of Spain: Instituto Geológico y Min
 
 * A. Romero                   a.romero@igme.es
 
+## Paper
+If you use the program in one of your studies, please cite this paper:
+* González-Jiménez, M. G., Aguilera, H., Merino, L. M., & Prados, A. R. (2023). Q-Facies: A tool for the quantitative interpretation of groundwater hydrochemical facies. SoftwareX, 101450.
+
+    https://www.softxjournal.com/article/S2352-7110(23)00146-2/fulltext
 
 ## Copyright
 License: GNU General Public License v3.0 
