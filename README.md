@@ -102,7 +102,7 @@ All authors belong to the Geological Survey of Spain: Instituto Geológico y Min
 If you use the program in one of your studies, please cite this paper:
 * González-Jiménez, M. G., Aguilera, H., Merino, L. M., & Prados, A. R. (2023). Q-Facies: A tool for the quantitative interpretation of groundwater hydrochemical facies. SoftwareX, 101450.
 
-    https://www.softxjournal.com/article/S2352-7110(23)00146-2/fulltext
+    https://www.sciencedirect.com/science/article/pii/S2352711023001462
 
 ## Copyright
 License: GNU General Public License v3.0 
